@@ -1,5 +1,6 @@
 # Tic Tac Toe
 
+from os import truncate
 import weakref
 
 
@@ -55,15 +56,10 @@ class Spielzug:
         self.zugnr = zugnr
         self.zug = ""
     
-    def pruefen(zug):
-        pass
-        
-
-
-    def zeichensetzen(self,  zug):
+    def zeichensetzen(self,  zug, plwert):
         print(zug)
         print(spiel1.felder)
-        spiel1.felder[zug] = 1
+        spiel1.felder[zug] = plwert
         print(spiel1.felder)
 
     def listefuehren(self):
@@ -96,23 +92,23 @@ class Spielzug:
         
         
         for tripel in Spielzug.winlist:
-            print(tripel[1])
+            #print(tripel[1])
             f1 = tripel[0]
             f2 = tripel[1]
             f3 = tripel[2]
-            print("Feldwert F1: ", f1)
+            """print("Feldwert F1: ", f1)
             print("FeldtypF1: ", type(f1))
             print("Wert F2:",  f2)
-            print("wert F3", f3)
+            print("wert F3", f3)"""
             
             
             w1 = spiel1.felder[f1]
-            print("Wert v W1: ", w1)
+            #print("Wert v W1: ", w1)
             w2 = int(spiel1.felder[f2])
             w3 = int(spiel1.felder[f3])
             
             z = self.summe(w1,  w2,  w3)
-            print("Summe der w Werte: ", z)
+            #print("Summe der w Werte: ", z)
             if z == 3:
                 nowin = False
                 break
@@ -124,16 +120,56 @@ class Spielzug:
         print("wert von  Nowin:", nowin)
         return nowin
 
+    def vollpruef(self):
+        vp = True
+        for spf in spiel1.felder:            
+            if spf != 0:
+                vp +=1
+        if vp == 9:
+            return False
+        else:
+            return True
+    
+    def korrfeld(self, zug):    # Sub - Funktion des Eingabeprüfungsloop in Zugpruefvorausf: Beantwortet die Frage ob das eingegebene Feld überhaupt existiert
+        if zug not in spiel1.felder:
+            print("Bitte geben Sie ein gültiges Feld ein")
+            return False
+        else:
+            return True
+    
+    def belegtesfeld(self, zug):   # Sub - Funktion des Eingabeprüfungsloop in Zugpruefvorausf: Beantwortet die Frage ob das eingegebene Feld schon belegt ist
+        if spiel1.felder.get(zug) != 0:
+            print("Das Feld ist bereits belegt")
+            return False
+        else:
+            return True
+    
+    def Zugpruefvorausf(self, zug):
+        wdh = True      # Variable zum prüfen ob 
+        while wdh:      # Eingabeprüfungsloop: kontrolliert ob die Eingabe korrekt ist.
+            kf = spielzug1.korrfeld(zug)
+            if kf == True:
+                bf = spielzug1.belegtesfeld(zug)
+                if bf == True:
+                    wdh = False
+        return True
+        
+
+
+
+
+
+
 class Player:
     
-    players = []
+    Players = []
     
     def __init__(self, playername, playernr, playersign):
         self.playername = playername
         self.playernr = playernr
         self.playersign = playersign
         
-        spiel1.players.append([weakref.ref(self), playername, playernr,  playersign])
+        Player.Players.append(self) 
 
 
 
@@ -141,30 +177,45 @@ if __name__=='__main__':
     
     spiel1 = Spielfeld()
     spieler1 = Player("Michi", 1, "X")
-    spieler2 = Player("Muschi", 2, "O")
+    spieler2 = Player("Muschi", -1, "O")
     korrzug = True
     fliste  = []
     spielzug1 = Spielzug("spieler1", 1)
-       
+    aktZug = ""
+           
+    print(Player.Players)
+    print("winprüf = ", spielzug1.winpruef())
+    print("vollprüf =", spielzug1.vollpruef())
     
-    while korrzug:
+    while spielzug1.winpruef() or not spielzug1.vollpruef():
         
-        aktZug = input("Ihr Zug:")
-        if aktZug not in spiel1.felder:
-            print("Bitte geben Sie ein gültiges Feld ein")
-        else:
-            print("Sie haben ",  aktZug,  " eingegeben. Dies ist ein gültiges Feld")
-            korrzug = False
-            
-    spielzug1.zeichensetzen(aktZug)
-    
-    spiel1.felderfuellen()
-    
-    if not spielzug1.winpruef():
-        print("GEWONNEN")
+        for pl in Player.Players:
+            print("{} ist am Zug!".format(pl.playername))
+            print("######################################################")        
+             
+            while korrzug:
+                
+                aktZug = input("Ihr Zug: ")
+                if aktZug not in spiel1.felder:
+                    print("Bitte geben Sie ein gültiges Feld ein")
+
+                elif spiel1.felder.get(aktZug) != 0:
+                    print("Das Feld ist bereits belegt, wählen Sie ein anderes aus!")
+
+                else:
+                    print("Sie haben ",  aktZug,  " eingeAgeben. Dies ist ein gültiges Feld")
+                    korrzug = False
+                
+                spielzug1.zeichensetzen(aktZug, pl.playernr)
+        
+                spiel1.felderfuellen()
+        
+                if not spielzug1.winpruef():
+                    print("GEWONNEN")
+                    break
     
     
     print(spiel1.felder)
     print(spiel1.fuellfeld)
-    print(spiel1.players)
+    print(Player.Players)
     print()
