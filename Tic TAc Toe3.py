@@ -190,8 +190,10 @@ if __name__=='__main__':
     while spielzug1.winpruef() or not spielzug1.vollpruef():
         
         for pl in Player.Players:
-            print("{} ist am Zug!".format(pl.playername))
-            print("######################################################")        
+            if spielzug1.winpruef() == True:
+
+                print("{} ist am Zug!".format(pl.playername))
+                print("######################################################")        
              
             while korrzug:
                 
